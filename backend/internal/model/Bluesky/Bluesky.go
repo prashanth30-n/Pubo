@@ -8,17 +8,20 @@ type ConnectedAccounts struct {
 	PlatformId       *int    `json:"PlatformId" db:"platform_id"`
 	Handle           *string `json:"Handle" db:"handle"`
 	DisplayName      *string `json:"DisplayName" db:"display_name"`
-	AvatarUrl        string
-	Password         *string `json:"Password" db:"access_token_encrypted"`
-	refershToken  string      `json:"refershToken" db:"refersh_token_encrypted"`
-	token_expires_at string
-	scopes           string
-	is_active        string
-	last_synced_at   string
+	AvatarUrl        string   `json:"avatarUrl" db:"avatar_url"`
+	Password         *string `json:"Password"`
+	AccessToken  *string `json:"acessToken" db:"access_token_encrypted"`
+	RefreshToken  *string  `json:"refreshToken" db:"refresh_token_encrypted"`
+	TokenExpiry string `json:"tokenExpiresAt" db:"token_expires_at"`
+	DID  string `json:"did",db:"did"`
+	PDSURL string `json:"pds_url",db:"pds_url"`
+	scopes    string `json:"scopes" db:"scopes"`
+	is_active        string `json:"isActive" db:"is_active"`
+	last_synced_at   string `json:"lastSyncedAt" db:"last_synced_at"`
 }
 type BlueskySessionResponse struct{
-	AccessJwt string `json:"acessJwt"`
-	RefreshJwt string `json:"refreshJwt`
+	AccessJwt *string `json:"acessJwt"`
+	RefreshJwt  *string `json:"refreshJwt`
 	Handle string `json:"handle"`
 	DID string `json:"did"`
 }

@@ -14,7 +14,7 @@ import (
 type QuoteService struct {
 	server *server.Server
 	client *http.Client
-	quotes []Quotes.Quote
+	quotes []Quotes.Quote 
 	index  int
 	mu     sync.Mutex
 }
