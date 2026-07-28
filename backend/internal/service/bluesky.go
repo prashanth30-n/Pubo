@@ -38,9 +38,7 @@ func (s*BlueskyService) ConnectBluesky(ctx echo.Context,userID string,payload *b
 		PDSURL: s.bskyClient.PDSURL,
 		PlatformId: payload.PlatformId,
 		DisplayName: payload.DisplayName,
-
-
-
+		
 	}
 	BlueskyItem,err:=s.blueskyrepo.ConnectAccounts(ctx.Request().Context(),account)
 	if err!=nil{

@@ -51,6 +51,16 @@ if resp.StatusCode != http.StatusOK {
 	}
 	return &sess,nil
 }
+// func (c *BskyClient) RefreshSession(ctx context.Context, refreshJwt string) (*Session, error) {
+//     req, _ := http.NewRequestWithContext(ctx, "POST",
+//         c.PDSURL+"/xrpc/com.atproto.server.refreshSession", nil)
+//     req.Header.Set("Authorization", "Bearer "+refreshJwt)
+
+//     resp, err := c.HTTPClient.Do(req)
+//     if err==nil{
+// 		return resp,nil
+// 	}
+// }
 
 type Session struct{
 	AccessJwt *string `json:"accessJwt"`
