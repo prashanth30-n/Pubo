@@ -23,7 +23,7 @@ func NewLinkedinHandler(s *server.Server,LinkedinService *service.LinkedinServic
 func(h*LinkedinHandler) ConnectLinkedin(c echo.Context) error{
 	return Handle(
 		h.Handler,
-		func(c echo.Context,payload *linkedin.CreateLinkedinConnectionPayload)(*linkedin.LinkedInConnectedAccount,error){
+		func(c echo.Context,payload *linkedin.CreateLinkedinConnectionPayload)(*linkedin.LinkedinConnectedAccount,error){
 			userId:=middleware.GetUserID(c)
 			return h.LinkedinService.CreateLinkedinConnection(c,userId,payload)
 		},
