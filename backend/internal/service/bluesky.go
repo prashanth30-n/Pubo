@@ -50,5 +50,4 @@ func (s*BlueskyService) ConnectBluesky(ctx echo.Context,userID string,payload *b
 	eventLogger.Info().Str("event","bluesky_account_connected").Msg("Bluesky account successfully created")
 	
 return BlueskyItem,nil
-
 }

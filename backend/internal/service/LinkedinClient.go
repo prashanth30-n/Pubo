@@ -45,8 +45,6 @@ func(c *LinkedinClient) UserInfo(ctx context.Context,accessToken string)(*UserIn
 	}
 	return &ui,nil
 }
-
-
 type UserInfo struct{
 	Sub string `json:"sub"` //linkedin member id
 	Name string `json:"name"` //name

@@ -72,7 +72,5 @@ RETURNING *`;
 		return nil,fmt.Errorf("failed to collect a row from table %w",err)
 	
 	   }
-	
 	   return &BlueskyItem,nil
-
 }

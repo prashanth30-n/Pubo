@@ -14,8 +14,9 @@ type MediaRepo interface {
 	GetByID(ctx context.Context,id string)(*media.Asset,error)
 	ListByOwner(ctx context.Context,ownerUserID string,limit int ,offset int)
 	Delete(ctx context.Context,id string) error
+	
 }
-type MediaRepository struct{
+type MediaRepository struct{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
 server *server.Server
 }
 func NewMediaRepository(server *server.Server) *MediaRepository{
