@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/PatibandlaVenkat/Pubo/internal/server"
 	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/prashanth30-n/Pubo/internal/server"
 )
 
 type MiddleWares struct {
@@ -13,10 +13,10 @@ type MiddleWares struct {
 	RateLimit       *RateLimitMiddleware
 }
 
-func NewMiddlewares(s *server.Server) *MiddleWares{
+func NewMiddlewares(s *server.Server) *MiddleWares {
 	var nrApp *newrelic.Application
-	if s.LoggerService!=nil{
-		nrApp=s.LoggerService.GetApplication()
+	if s.LoggerService != nil {
+		nrApp = s.LoggerService.GetApplication()
 	}
 	return &MiddleWares{
 		Global:          NewGlobalMiddleWares(s),

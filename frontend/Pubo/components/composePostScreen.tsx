@@ -16,6 +16,8 @@ import { exceedsLimit } from "@/constants/Platforms";
 import { theme } from "../constants/themes";
 import { usePostComposer } from "../hooks/usePostComposer";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@clerk/clerk-expo";
+import { postsApi } from "@/api/Postsapi";
 
 interface Props {
   // Optional: pass this when the screen is shown in a Modal/sheet so there's
@@ -25,19 +27,17 @@ interface Props {
 
 export function ComposePostScreen({ onClose }: Props) {
   const composer = usePostComposer();
+  const { getToken } = useAuth();
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
 
   const overLimit = exceedsLimit(composer.content, composer.platforms);
   const disableSubmit = !composer.canSubmit || overLimit || composer.isSaving;
 
-  async function handleUpload(localUri: string) {
-    // Wire this up to the image-upload endpoint you already have.
-    // const formData = new FormData();
-    // formData.append('file', { uri: localUri, name: 'photo.jpg', type: 'image/jpeg' } as any);
-    // const res = await fetch(`${API_BASE}/uploads`, { method: 'POST', body: formData });
-    // const json = await res.json();
-    // return { id: json.id, url: json.url };
-    return { id: localUri, url: localUri };
+  async function handleUpload(asset: { uri: string; fileName?: string | null; mimeType?: string | null; file?: File }) {
+    const token = await getToken();
+    if (!token) throw new Error("Please sign in before uploading an image");
+    const uploaded = await postsApi.uploadImage(token, asset.uri, asset.fileName ?? "image.jpg", asset.mimeType ?? "image/jpeg", asset.file);
+    return { id: uploaded.id, url: uploaded.storageURL };
   }
 
   return (
@@ -84,7 +84,7 @@ export function ComposePostScreen({ onClose }: Props) {
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.actionBtn, styles.draftBtn]}
-          onPress={composer.saveDraft}
+          onPress={async () => { const token = await getToken(); if (!token) return; await composer.saveDraft(token); }}
           disabled={composer.isSaving}
         >
           <Text style={styles.draftText}>Save draft</Text>
@@ -108,7 +108,7 @@ export function ComposePostScreen({ onClose }: Props) {
             styles.postBtn,
             disableSubmit && styles.disabled,
           ]}
-          onPress={composer.publishNow}
+          onPress={async () => { const token = await getToken(); if (!token) throw new Error("Please sign in before posting"); await composer.publishNow(token); }}
           disabled={disableSubmit}
         >
           {composer.isSaving ? (

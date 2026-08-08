@@ -10,7 +10,7 @@ interface Props{
     onRemove:(id:string)=>void;
      // Plug your existing upload endpoint in here — it takes a local file URI
   // and should return the uploaded image's id + public URL.
-  onUpload:(localUri:string)=>Promise<{id:string; url:string}>
+  onUpload:(asset:{uri:string; fileName?:string | null; mimeType?:string | null; file?: File})=>Promise<{id:string; url:string}>
 
 }
 export function ImageAttachments({images,onAdd,onRemove,onUpload}:Props){
@@ -27,7 +27,7 @@ export function ImageAttachments({images,onAdd,onRemove,onUpload}:Props){
         setIsUploading(true);
         try{
             for(const asset of result.assets){
-                const uploaded=await onUpload(asset.uri);
+                const uploaded=await onUpload(asset);
                 onAdd({id:uploaded.id,url:uploaded.url});
             }
         }

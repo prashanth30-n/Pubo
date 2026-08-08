@@ -1,23 +1,26 @@
 package repository
 
 import (
-	linkedin "github.com/PatibandlaVenkat/Pubo/internal/model/Linkedin"
-	"github.com/PatibandlaVenkat/Pubo/internal/server"
 	"context"
 	"fmt"
+
 	"github.com/jackc/pgx/v5"
+	linkedin "github.com/prashanth30-n/Pubo/internal/model/Linkedin"
+	"github.com/prashanth30-n/Pubo/internal/server"
 )
-type LinkedinRepository struct{
+
+type LinkedinRepository struct {
 	server *server.Server
 }
-func NewLinkedinRepository(s *server.Server)(*LinkedinRepository){
+
+func NewLinkedinRepository(s *server.Server) *LinkedinRepository {
 	return &LinkedinRepository{
-		server:s,
+		server: s,
 	}
 
 }
-func(r *LinkedinRepository) ConnectLinkedinAccount(ctx context.Context,account *linkedin.LinkedinConnectedAccount)(*linkedin.LinkedinConnectedAccount,error){
-	stmt:=`INSERT INTO connected_accounts (
+func (r *LinkedinRepository) ConnectLinkedinAccount(ctx context.Context, account *linkedin.LinkedinConnectedAccount) (*linkedin.LinkedinConnectedAccount, error) {
+	stmt := `INSERT INTO connected_accounts (
     user_id,
     handle,
     platform_id,
@@ -44,27 +47,24 @@ DO UPDATE SET
     display_name = EXCLUDED.display_name,
     did = EXCLUDED.did,
     pds_url = EXCLUDED.pds_url
-RETURNING *`;
-	   rows,err:=r.server.DB.Pool.Query(ctx,stmt,pgx.NamedArgs{
-		"user_id":account.UserID,
-		"handle":account.Handle,
-		"platform_id":account.PlatformId,
-		"access_token_encrypted":account.AccessToken,
-		"display_name":account.DisplayName,
-		"did":account.DID,
-		"pds_url":account.PDSURL,
-		"avatar_url":account.AvatarUrl,
-	   })
-	   if err!=nil{
-		return nil,fmt.Errorf("failed to execute created linkedin connected account %w",err)
-	   }
-	   LinkedinItem,err:=pgx.CollectOneRow(rows,pgx.RowToStructByName[linkedin.LinkedinConnectedAccount])
-	   if err!=nil{
-		return nil,fmt.Errorf("failed to collect a row from table %w",err)
-	
-	   }
-	   return &LinkedinItem,nil
+RETURNING *`
+	rows, err := r.server.DB.Pool.Query(ctx, stmt, pgx.NamedArgs{
+		"user_id":                account.UserID,
+		"handle":                 account.Handle,
+		"platform_id":            account.PlatformId,
+		"access_token_encrypted": account.AccessToken,
+		"display_name":           account.DisplayName,
+		"did":                    account.DID,
+		"pds_url":                account.PDSURL,
+		"avatar_url":             account.AvatarUrl,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute created linkedin connected account %w", err)
+	}
+	LinkedinItem, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[linkedin.LinkedinConnectedAccount])
+	if err != nil {
+		return nil, fmt.Errorf("failed to collect a row from table %w", err)
+
+	}
+	return &LinkedinItem, nil
 }
-
-
-

@@ -1,22 +1,5 @@
-import { View, Text,StyleSheet } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { use } from 'react'
-import useTheme from "@/hooks/useTheme";
-
-
-const posted = () => {
-  const {colors,isDarkMode} = useTheme();
-  return (
-    <SafeAreaView
-     style={{    
-    flex:1,
-    backgroundColor: colors.backGround,}}
-    >
-    <View>
-      <Text style={{color:colors.text}}>posted</Text>
-    </View>
-    </SafeAreaView>
-  )
-}
-
-export default posted
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context'; import { useAuth } from '@clerk/clerk-expo'; import useTheme from '@/hooks/useTheme'; import { postsApi, SavedPost } from '@/api/Postsapi';
+export default function Posted(){const {colors}=useTheme();const {getToken}=useAuth();const tokenRef=useRef(getToken);const [posts,setPosts]=useState<SavedPost[]>([]);const [offset,setOffset]=useState(0);const [total,setTotal]=useState(0);const [loading,setLoading]=useState(true);const [more,setMore]=useState(false);const load=useCallback(async(reset=false)=>{if(more)return;setMore(true);try{const token=await tokenRef.current();if(!token)return;const page=await postsApi.list(token,'posted',10,reset?0:offset);setPosts(p=>reset?page.data:[...p,...page.data]);setOffset((reset?0:offset)+page.data.length);setTotal(page.total)}finally{setLoading(false);setMore(false)}},[more,offset]);useEffect(()=>{tokenRef.current=getToken},[getToken]);useEffect(()=>{load(true)},[]);return <SafeAreaView style={[s.screen,{backgroundColor:colors.backGround}]}><Text style={[s.title,{color:colors.text}]}>Posted</Text>{loading?<ActivityIndicator/>:<FlatList data={posts} keyExtractor={p=>p.id} onEndReached={()=>{if(offset<total)load()}} onEndReachedThreshold={.4} ListEmptyComponent={<Text style={[s.empty,{color:colors.text}]}>No posts published yet.</Text>} ListFooterComponent={more?<ActivityIndicator/>:null} renderItem={({item})=><Card post={item}/>} />}</SafeAreaView>};
+function Card({post}:{post:SavedPost}){return <View style={s.card}><Text style={s.content}>{post.content}</Text>{post.media.length>0&&<FlatList horizontal data={post.media} keyExtractor={m=>m.id} renderItem={({item})=><Image source={{uri:item.storageURL}} style={s.image}/>} showsHorizontalScrollIndicator={false}/>}<Text style={s.meta}>{post.platforms.join(' · ')} · {new Date(post.createdAt).toLocaleDateString()}</Text></View>};const s=StyleSheet.create({screen:{flex:1,padding:20},title:{fontSize:24,fontWeight:'700',marginBottom:16},card:{backgroundColor:'#fff',borderRadius:14,padding:14,marginBottom:12},content:{fontSize:16,color:'#172033',marginBottom:10},image:{width:150,height:110,borderRadius:9,marginRight:8},meta:{marginTop:10,color:'#687385'},empty:{textAlign:'center',marginTop:32}});

@@ -6,9 +6,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/newrelic/go-agent/v3/integrations/nrpkgerrors"
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/PatibandlaVenkat/Pubo/internal/middleware"
-	"github.com/PatibandlaVenkat/Pubo/internal/server"
-	"github.com/PatibandlaVenkat/Pubo/internal/validation"
+	"github.com/prashanth30-n/Pubo/internal/middleware"
+	"github.com/prashanth30-n/Pubo/internal/server"
+	"github.com/prashanth30-n/Pubo/internal/validation"
 )
 
 // Handler provides base functionality for all handlers
@@ -108,7 +108,7 @@ func handleRequest[Req validation.Validatable](
 	path := c.Path()
 	route := path
 
-	// Get New Relic transaction from context	
+	// Get New Relic transaction from context
 	txn := newrelic.FromContext(c.Request().Context())
 	if txn != nil {
 		txn.AddAttribute("handler.name", route)
@@ -207,20 +207,20 @@ func handleRequest[Req validation.Validatable](
 }
 
 // Handle wraps a handler with validation, error handling, logging, metrics, and tracing
-//these are closure implmentations in go fucntions inside a function and the paramters of that scope passed to below function using the closures
-//see closure examples for more clariety
-func Handle[Req validation.Validatable,Res any](
+// these are closure implmentations in go fucntions inside a function and the paramters of that scope passed to below function using the closures
+// see closure examples for more clariety
+func Handle[Req validation.Validatable, Res any](
 	h Handler,
-	handler HandlerFunc[Req,Res],
+	handler HandlerFunc[Req, Res],
 	status int,
 	req Req,
 
-)echo.HandlerFunc{
-	return func(c echo.Context) error{
-		return handleRequest(c,req,func(c echo.Context,req Req)(interface{},error){
-			return handler(c,req)
+) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return handleRequest(c, req, func(c echo.Context, req Req) (interface{}, error) {
+			return handler(c, req)
 
-		},JSONResponseHandler{status: status})
+		}, JSONResponseHandler{status: status})
 	}
 }
 

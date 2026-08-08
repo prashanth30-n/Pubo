@@ -1,8 +1,8 @@
 package job
 
 import (
-	"github.com/PatibandlaVenkat/Pubo/internal/config"
 	"github.com/hibiken/asynq"
+	"github.com/prashanth30-n/Pubo/internal/config"
 	"github.com/rs/zerolog"
 )
 
@@ -11,40 +11,41 @@ type JobService struct {
 	server *asynq.Server
 	logger *zerolog.Logger
 }
-func NewJobService(logger *zerolog.Logger,cfg *config.Config) *JobService{
-	redisAddr:=cfg.Redis.Address
 
-	client:=asynq.NewClient(asynq.RedisClientOpt{
-		Addr:redisAddr,
+func NewJobService(logger *zerolog.Logger, cfg *config.Config) *JobService {
+	redisAddr := cfg.Redis.Address
+
+	client := asynq.NewClient(asynq.RedisClientOpt{
+		Addr: redisAddr,
 	})
-	server:=asynq.NewServer(
-		asynq.RedisClientOpt{Addr:redisAddr},
+	server := asynq.NewServer(
+		asynq.RedisClientOpt{Addr: redisAddr},
 		asynq.Config{
-			Concurrency:10,
-			Queues:map[string]int{
-				"critical":6,
-				"default":3,
-				"low":1,
+			Concurrency: 10,
+			Queues: map[string]int{
+				"critical": 6,
+				"default":  3,
+				"low":      1,
 			},
 		},
 	)
 	return &JobService{
-		Client:client,
+		Client: client,
 		server: server,
 		logger: logger,
 	}
 }
-func (j *JobService) Start() error{
-	mux:=asynq.NewServeMux()
-	mux.HandleFunc(TaskWelcome,j.handleWelcomeEmailTask)
+func (j *JobService) Start() error {
+	mux := asynq.NewServeMux()
+	mux.HandleFunc(TaskWelcome, j.handleWelcomeEmailTask)
 	j.logger.Info().Msg("starting the background job server")
-	if err:=j.server.Start(mux); err!=nil{
+	if err := j.server.Start(mux); err != nil {
 		return err
 	}
 	return nil
 }
 
-func(j*JobService) Stop(){
+func (j *JobService) Stop() {
 	j.logger.Info().Msg("stopping background job server")
 	j.server.Shutdown()
 	j.Client.Close()

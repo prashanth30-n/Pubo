@@ -41,18 +41,19 @@ export function usePostComposer(options: Options = {}) {
     return created;
   }, [content, platforms, images, postId]);
 
-  const saveDraft = useCallback(async () => {
+  const saveDraft = useCallback(async (token: string) => {
     setIsSaving(true);
     setError(null);
     try {
-      await persist();
+      const saved = await postsApi.saveDraft(token, { content, mediaIds: images.map((image) => image.id) });
+      setPostId(saved.id);
       setStatus('draft');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save draft');
     } finally {
       setIsSaving(false);
     }
-  }, [persist]);
+  }, [content, images]);
 
   const schedule = useCallback(
     async (isoTimestamp: string) => {
@@ -72,19 +73,19 @@ export function usePostComposer(options: Options = {}) {
     [persist]
   );
 
-  const publishNow = useCallback(async () => {
+  const publishNow = useCallback(async (token: string) => {
     setIsSaving(true);
     setError(null);
     try {
-      const saved = await persist();
-      await postsApi.publishNow(saved.id);
+      const result = await postsApi.publish(token, { content, platforms, mediaIds: images.map((image) => image.id) });
+      if (result.results.some((platform) => platform.status === 'failed')) throw new Error(result.results.filter((platform) => platform.status === 'failed').map((platform) => `${platform.platform}: ${platform.error}`).join('\n'));
       setStatus('published');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not publish post');
     } finally {
       setIsSaving(false);
     }
-  }, [persist]);
+  }, [content, platforms, images]);
 
   const canSubmit = content.trim().length > 0 && platforms.length > 0;
 

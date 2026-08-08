@@ -2,22 +2,23 @@ package media
 
 import (
 	"time"
-	 "github.com/PatibandlaVenkat/Pubo/internal/model"
+
+	"github.com/prashanth30-n/Pubo/internal/model"
 
 	"github.com/google/uuid"
 )
 
 type Asset struct {
 	model.Base
-	ID            uuid.UUID
-	OwnerUserID   string
-	OriginalName  string
-	BlobName      string
-	StorageURL    string
-	ContainerName string
-	ContentType   string
-	SizeBytes     int64
-	ETag          string
-	CreatedAt     time.Time
-	UpdatedAt time.Time
+	ID            uuid.UUID `json:"id"`
+	OwnerUserID   string    `json:"ownerUserId"`
+	OriginalName  string    `json:"originalName"`
+	BlobName      string    `json:"blobName"`
+	StorageURL    string    `json:"storageURL"`
+	ContainerName string    `json:"containerName"`
+	ContentType   string    `json:"contentType"`
+	SizeBytes     int64     `json:"sizeBytes"`
+	ETag          string    `json:"etag"`
+	CreatedAt     time.Time `json:"createdAt"`
+	UpdatedAt     time.Time `json:"updatedAt"`
 }

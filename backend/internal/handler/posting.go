@@ -1,50 +1,51 @@
 package handler
 
 import (
-		"io"
 	"net/http"
-	"encoding/json"
+	"strconv"
 
-	"github.com/PatibandlaVenkat/Pubo/internal/middleware"
 	"github.com/labstack/echo/v4"
+	"github.com/prashanth30-n/Pubo/internal/middleware"
+	"github.com/prashanth30-n/Pubo/internal/server"
+	"github.com/prashanth30-n/Pubo/internal/service"
 )
-type CreatePostRequest struct{
-	Content string `form:"content"`
-	AccountIDs []string `form:"account_ids"`
+
+type PostHandler struct {
+	Handler
+	service *service.PostService
 }
-func(h *Handler) CreatePost(c echo.Context) error{
-	userID:=middleware.GetUserID(c)
-	content:=c.FormValue("content")
-	var accountIDs []string
-	if err:=json.Unmarshal([]byte(c.FormValue("account_ids")),&accountIDs); err!=nil{
-		return echo.NewHTTPError(400,"invalid_account_ids")
+
+func NewPostHandler(s *server.Server, postService *service.PostService) *PostHandler {
+	return &PostHandler{Handler: NewHandler(s), service: postService}
+}
+func (h *PostHandler) Publish(c echo.Context) error {
+	var request service.PublishRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body")
 	}
-	form,err:=c.MultipartForm()
-	if err!=nil{
-		return echo.NewHTTPError(400,"invalid_form_data")
+	response, err := h.service.Publish(c.Request().Context(), middleware.GetUserID(c), request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	fileHeaders:=form.File["images"]
-	var images []service.ImageFile
-	for _,fh:=range fileHeaders{
-		src,err:=fh.Open()
-		if err!=nil{
-			continue
-		}
-		data,err:=io.ReadAll(src)
-		src.Close()
-		if err!=nil{
-			continue
-		}
-		images=apppend(images,service.ImageFile{
-			Name:fh.Filename,
-			Data:data,
-			 ContentType:fh.Header.Get("Content-Type"),
-		     Size:        fh.Size,
-		})
+	return c.JSON(http.StatusOK, response)
+}
+func (h *PostHandler) SaveDraft(c echo.Context) error {
+	var request service.DraftRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid request body")
 	}
-	post,err:=h.postService.CreatePost(c.Request().Context(),userID,content,accountIDs,images)
-	if err!=nil{
-		return echo.NewHTTPError(500,err.Error())
+	post, err := h.service.SaveDraft(c.Request().Context(), middleware.GetUserID(c), request)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-return c.JSON(http.StatusCreated,post)
+	return c.JSON(http.StatusCreated, post)
+}
+func (h *PostHandler) List(c echo.Context) error {
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	offset, _ := strconv.Atoi(c.QueryParam("offset"))
+	posts, err := h.service.List(c.Request().Context(), middleware.GetUserID(c), c.QueryParam("status"), limit, offset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, posts)
 }

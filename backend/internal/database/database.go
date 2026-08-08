@@ -7,13 +7,14 @@ import (
 	"net/url"
 	"strconv"
 	"time"
-pgxzero "github.com/jackc/pgx-zerolog"
-	"github.com/PatibandlaVenkat/Pubo/internal/config"
-	loggerConfig "github.com/PatibandlaVenkat/Pubo/internal/logger"
+
+	pgxzero "github.com/jackc/pgx-zerolog"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/newrelic/go-agent/v3/integrations/nrpgx5"
+	"github.com/prashanth30-n/Pubo/internal/config"
+	loggerConfig "github.com/prashanth30-n/Pubo/internal/logger"
 	"github.com/rs/zerolog"
 )
 
@@ -21,31 +22,31 @@ type Database struct {
 	Pool *pgxpool.Pool
 	log  *zerolog.Logger
 }
-type multiTracer struct{
-	tracers[]any
+type multiTracer struct {
+	tracers []any
 }
 
-func(mt *multiTracer)TraceQueryStart(ctx context.Context,conn *pgx.Conn,data pgx.TraceQueryStartData) context.Context{
-	for _,tracer:=range mt.tracers{
-		if t,ok:=tracer.(interface{
-			TraceQueryStart(context.Context,*pgx.Conn,pgx.TraceQueryStartData) context.Context
-		}); ok{
-			ctx=t.TraceQueryStart(ctx,conn,data);
+func (mt *multiTracer) TraceQueryStart(ctx context.Context, conn *pgx.Conn, data pgx.TraceQueryStartData) context.Context {
+	for _, tracer := range mt.tracers {
+		if t, ok := tracer.(interface {
+			TraceQueryStart(context.Context, *pgx.Conn, pgx.TraceQueryStartData) context.Context
+		}); ok {
+			ctx = t.TraceQueryStart(ctx, conn, data)
 		}
 	}
 	return ctx
 }
-func(mt *multiTracer) TraceQueryEnd(ctx context.Context,conn *pgx.Conn,data pgx.TraceQueryEndData){
-	for _,tracer:=range mt.tracers{
-		if t,ok:=tracer.(interface{
-			TraceQueryEnd(context.Context,*pgx.Conn,pgx.TraceQueryEndData)
-		}); ok{
-			t.TraceQueryEnd(ctx,conn,data)
+func (mt *multiTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data pgx.TraceQueryEndData) {
+	for _, tracer := range mt.tracers {
+		if t, ok := tracer.(interface {
+			TraceQueryEnd(context.Context, *pgx.Conn, pgx.TraceQueryEndData)
+		}); ok {
+			t.TraceQueryEnd(ctx, conn, data)
 		}
 	}
 }
-const DatabasePingTimeout=10
 
+const DatabasePingTimeout = 10
 
 func New(cfg *config.Config, logger *zerolog.Logger, loggerService *loggerConfig.LoggerService) (*Database, error) {
 	hostPort := net.JoinHostPort(cfg.Database.Host, strconv.Itoa(cfg.Database.Port))
@@ -112,7 +113,7 @@ func New(cfg *config.Config, logger *zerolog.Logger, loggerService *loggerConfig
 	return database, nil
 }
 
-func(db *Database) Close() error{
+func (db *Database) Close() error {
 	db.log.Info().Msg("closing database connection pool")
 	db.Pool.Close()
 	return nil

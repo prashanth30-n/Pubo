@@ -1,19 +1,21 @@
 package repository
 
-import "github.com/PatibandlaVenkat/Pubo/internal/server"
+import "github.com/prashanth30-n/Pubo/internal/server"
 
-type Repositories struct{
-	Media *MediaRepository
-	Bluesky *BlueskyRepository
-	Signup *SignupRepository
+type Repositories struct {
+	Media    *MediaRepository
+	Bluesky  *BlueskyRepository
+	Signup   *SignupRepository
 	Linkedin *LinkedinRepository
-
+	Posts    *PostRepository
 }
-func NewRepositories(s *server.Server) *Repositories{
+
+func NewRepositories(s *server.Server) *Repositories {
 	return &Repositories{
-		Media:NewMediaRepository(s),
-		Bluesky: NewBlueskyRepository(s),
-		Signup: NewSignupRepository(s),
+		Media:    NewMediaRepository(s),
+		Bluesky:  NewBlueskyRepository(s),
+		Signup:   NewSignupRepository(s),
 		Linkedin: NewLinkedinRepository(s),
+		Posts:    NewPostRepository(s),
 	}
 }

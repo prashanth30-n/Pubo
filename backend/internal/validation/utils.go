@@ -1,53 +1,54 @@
 package validation
 
 import (
-	"regexp"
-	"strings"
 	"fmt"
 	"reflect"
+	"regexp"
+	"strings"
 
-	"github.com/PatibandlaVenkat/Pubo/internal/errs"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/prashanth30-n/Pubo/internal/errs"
 )
-type Validatable interface{
-	Validate ()error
+
+type Validatable interface {
+	Validate() error
 }
-type CustomValidationError struct{
-	Field string
+type CustomValidationError struct {
+	Field   string
 	Message string
 }
 
-type CustomValidationErrors[] CustomValidationError
+type CustomValidationErrors []CustomValidationError
 
-func(c CustomValidationErrors) Error() string{
-return "validation failed"
+func (c CustomValidationErrors) Error() string {
+	return "validation failed"
 }
 
-func BindAndValidate(c echo.Context,payload Validatable) error{
-	if err:=c.Bind(payload); err!=nil{
-	message := strings.Split(strings.Split(err.Error(), ",")[1], "message=")[1]
-	return errs.NewBadRequestError(message,false,nil,nil,nil)
+func BindAndValidate(c echo.Context, payload Validatable) error {
+	if err := c.Bind(payload); err != nil {
+		message := strings.Split(strings.Split(err.Error(), ",")[1], "message=")[1]
+		return errs.NewBadRequestError(message, false, nil, nil, nil)
 	}
-	if msg,fieldErrors:=validateStruct(payload); fieldErrors!=nil{
-return errs.NewBadRequestError(msg,true,nil,fieldErrors,nil)
+	if msg, fieldErrors := validateStruct(payload); fieldErrors != nil {
+		return errs.NewBadRequestError(msg, true, nil, fieldErrors, nil)
 	}
 	return nil
 
 }
-func validateStruct(v Validatable) (string,[]errs.FieldError){
-	if err:=v.Validate(); err!=nil{
+func validateStruct(v Validatable) (string, []errs.FieldError) {
+	if err := v.Validate(); err != nil {
 		return extractValidationErrors(err)
 	}
-	return "",nil
+	return "", nil
 }
-func extractValidationErrors(err error)(string,[]errs.FieldError){
+func extractValidationErrors(err error) (string, []errs.FieldError) {
 	var fieldErrors []errs.FieldError
-	validationErrors,ok:=err.(validator.ValidationErrors)
-	if !ok{
-		CustomValidationErrors:=err.(CustomValidationErrors)
-		for _,err:=range CustomValidationErrors{
-			fieldErrors=append(fieldErrors, errs.FieldError{
+	validationErrors, ok := err.(validator.ValidationErrors)
+	if !ok {
+		CustomValidationErrors := err.(CustomValidationErrors)
+		for _, err := range CustomValidationErrors {
+			fieldErrors = append(fieldErrors, errs.FieldError{
 				Field: err.Field,
 				Error: err.Message,
 			})
@@ -97,8 +98,9 @@ func extractValidationErrors(err error)(string,[]errs.FieldError){
 			Error: msg,
 		})
 	}
-return "Validation failed", fieldErrors
+	return "Validation failed", fieldErrors
 }
+
 var uuidRegex = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 
 func IsValidUUID(uuid string) bool {

@@ -1,10 +1,10 @@
 package service
 
 import (
-	"github.com/PatibandlaVenkat/Pubo/internal/lib/job"
-	"github.com/PatibandlaVenkat/Pubo/internal/lib/storage"
-	"github.com/PatibandlaVenkat/Pubo/internal/repository"
-	"github.com/PatibandlaVenkat/Pubo/internal/server"
+	"github.com/prashanth30-n/Pubo/internal/lib/job"
+	"github.com/prashanth30-n/Pubo/internal/lib/storage"
+	"github.com/prashanth30-n/Pubo/internal/repository"
+	"github.com/prashanth30-n/Pubo/internal/server"
 )
 
 type Services struct {
@@ -15,6 +15,7 @@ type Services struct {
 	BlueskyService  *BlueskyService
 	SignUpService   *SignUpService
 	LinkedinService *LinkedinService
+	PostService     *PostService
 }
 
 func NewServices(s *server.Server, repos *repository.Repositories) (*Services, error) {
@@ -28,6 +29,7 @@ func NewServices(s *server.Server, repos *repository.Repositories) (*Services, e
 		return nil, err
 	}
 	mediaService := NewMediaService(s, *repos.Media, blobClient)
+	postService := NewPostService(repos.Posts, repos.Media, blobClient)
 	return &Services{
 		Job:             s.Job,
 		Auth:            authService,
@@ -36,5 +38,6 @@ func NewServices(s *server.Server, repos *repository.Repositories) (*Services, e
 		BlueskyService:  BlueskyService,
 		SignUpService:   SignUpService,
 		LinkedinService: LinkedinService,
+		PostService:     postService,
 	}, nil
 }

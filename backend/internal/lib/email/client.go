@@ -2,40 +2,41 @@ package email
 
 import (
 	"bytes"
-	"html/template"
 	"fmt"
+	"html/template"
 
-	"github.com/PatibandlaVenkat/Pubo/internal/config"
-	zerolog "github.com/rs/zerolog"
 	"github.com/pkg/errors"
+	"github.com/prashanth30-n/Pubo/internal/config"
 	"github.com/resend/resend-go/v2"
+	zerolog "github.com/rs/zerolog"
 )
-type Client struct{
+
+type Client struct {
 	client *resend.Client
 	logger *zerolog.Logger
 }
 
-func NewClient(cfg *config.Config,logger *zerolog.Logger) *Client{
+func NewClient(cfg *config.Config, logger *zerolog.Logger) *Client {
 	return &Client{
-		client:resend.NewClient(cfg.Integration.ResendAPIKey),
-		logger:logger,
+		client: resend.NewClient(cfg.Integration.ResendAPIKey),
+		logger: logger,
 	}
 }
-func (c *Client) SendEmail(to,subject string,templateName Template,data map[string]string) error{
-	tmplPath:=fmt.Sprintf("%s/%s.html","templates/emails",templateName)
+func (c *Client) SendEmail(to, subject string, templateName Template, data map[string]string) error {
+	tmplPath := fmt.Sprintf("%s/%s.html", "templates/emails", templateName)
 
-	tmpl,err:=template.ParseFiles(tmplPath)
+	tmpl, err := template.ParseFiles(tmplPath)
 
-	if err!=nil{
-		return errors.Wrapf(err,"failed to parse email template %s",templateName)
+	if err != nil {
+		return errors.Wrapf(err, "failed to parse email template %s", templateName)
 	}
 	var body bytes.Buffer
 
-	if err:=tmpl.Execute(&body,data); err!=nil{
-		return errors.Wrapf(err,"failed to execute email template %s",templateName)
+	if err := tmpl.Execute(&body, data); err != nil {
+		return errors.Wrapf(err, "failed to execute email template %s", templateName)
 	}
-	params:=&resend.SendEmailRequest{
-From:    fmt.Sprintf("%s <%s>", "PUBO", "onboarding@resend.dev"),
+	params := &resend.SendEmailRequest{
+		From:    fmt.Sprintf("%s <%s>", "PUBO", "onboarding@resend.dev"),
 		To:      []string{to},
 		Subject: subject,
 		Html:    body.String(),

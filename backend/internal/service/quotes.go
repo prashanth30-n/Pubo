@@ -7,14 +7,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/PatibandlaVenkat/Pubo/internal/model/Quotes"
-	"github.com/PatibandlaVenkat/Pubo/internal/server"
+	"github.com/prashanth30-n/Pubo/internal/model/Quotes"
+	"github.com/prashanth30-n/Pubo/internal/server"
 )
 
 type QuoteService struct {
 	server *server.Server
 	client *http.Client
-	quotes []Quotes.Quote 
+	quotes []Quotes.Quote
 	index  int
 	mu     sync.Mutex
 }

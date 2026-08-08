@@ -6,22 +6,22 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/PatibandlaVenkat/Pubo/internal/middleware"
-	"github.com/PatibandlaVenkat/Pubo/internal/server"
 	"github.com/labstack/echo/v4"
+	"github.com/prashanth30-n/Pubo/internal/middleware"
+	"github.com/prashanth30-n/Pubo/internal/server"
 )
 
-type HealthHandler struct{
+type HealthHandler struct {
 	Handler
 }
 
-func NewHealthHandler(s*server.Server) *HealthHandler{
+func NewHealthHandler(s *server.Server) *HealthHandler {
 	return &HealthHandler{
 		Handler: NewHandler(s),
 	}
 }
 func (h *HealthHandler) CheckHealth(c echo.Context) error {
-	
+
 	start := time.Now()
 	logger := middleware.GetLogger(c).With().
 		Str("operation", "health_check").

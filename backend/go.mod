@@ -1,4 +1,4 @@
-module github.com/PatibandlaVenkat/Pubo
+module github.com/prashanth30-n/Pubo
 
 go 1.25.4
 
