@@ -1,6 +1,6 @@
 # PUBO
 
-PUBO is a cross-platform mobile application built around the philosophy of **Building in Public**. It enables creators, developers, founders, and professionals to compose content in both Bluesky and Linkedin.Pubo is built to encourage Learning and Building in Publi
+PUBO is a cross-platform mobile application built around the philosophy of **Building in Public**. It enables creators, developers, founders, and professionals to compose content in both Bluesky and Linkedin.Pubo is built to encourage Learning and Building in Public
 
 
 
@@ -10,6 +10,7 @@ PUBO is a cross-platform mobile application built around the philosophy of **Bui
   <img src="https://raw.githubusercontent.com/prashanth30-n/Pubo/master/pubo_2.jpeg" width="250"/>
   <img src="https://raw.githubusercontent.com/prashanth30-n/Pubo/master/pubo_1.jpeg" width="250"/>
   <img src="https://raw.githubusercontent.com/prashanth30-n/Pubo/master/pubo_3.jpeg" width="250"/>
+  <img src="https://raw.githubusercontent.com/prashanth30-n/Pubo/master/pubo_4.jpeg" width="250"/>
 </p>
 
 ## 🏛️ System Architecture
